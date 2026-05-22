@@ -87,6 +87,27 @@ or
 docker compose up postgres
 ```
 
+## API Documentation (OpenAPI / Swagger)
+
+This project uses [springdoc-openapi](https://springdoc.org/) to automatically
+generate OpenAPI 3 documentation for the endpoints exposed by the application.
+
+Once the application is running, the documentation is available at:
+
+- Swagger UI: <http://localhost:8080/swagger-ui.html>
+- OpenAPI JSON: <http://localhost:8080/v3/api-docs>
+- OpenAPI YAML: <http://localhost:8080/v3/api-docs.yaml>
+
+Configuration is provided by:
+
+- `org.springframework.samples.petclinic.system.OpenApiConfig` &mdash; defines the
+  API info (title, description, license, contact).
+- `springdoc.*` properties in `src/main/resources/application.properties`.
+
+Endpoints can be further documented by annotating controllers with the
+`@Tag`, `@Operation`, `@Parameter`, and `@Schema` annotations from
+`io.swagger.v3.oas.annotations`.
+
 ## Test Applications
 
 At development time we recommend you use the test applications set up as `main()` methods in `PetClinicIntegrationTests` (using the default H2 database and also adding Spring Boot Devtools), `MySqlTestApplication` and `PostgresIntegrationTests`. These are set up so that you can run the apps in your IDE to get fast feedback and also run the same classes as integration tests against the respective database. The MySql integration tests use Testcontainers to start the database in a Docker container, and the Postgres tests use Docker Compose to do the same thing.

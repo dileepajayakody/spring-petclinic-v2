@@ -17,6 +17,9 @@ package org.springframework.samples.petclinic.vet;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Arjen Poutsma
  */
 @Controller
+@Tag(name = "Vets", description = "Endpoints to list veterinarians and their specialties")
 class VetController {
 
 	private final VetRepository vetRepository;
@@ -42,6 +46,8 @@ class VetController {
 	}
 
 	@GetMapping("/vets.html")
+	@Operation(summary = "Show the paginated HTML list of veterinarians",
+			description = "Renders the 'vets/vetList' Thymeleaf view with a page of vets.")
 	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
@@ -67,6 +73,9 @@ class VetController {
 	}
 
 	@GetMapping({ "/vets" })
+	@Operation(summary = "List all veterinarians as JSON or XML",
+			description = "Returns the full list of veterinarians wrapped in a 'Vets' object "
+					+ "to simplify JSON and XML serialization.")
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for JSon/Object mapping
