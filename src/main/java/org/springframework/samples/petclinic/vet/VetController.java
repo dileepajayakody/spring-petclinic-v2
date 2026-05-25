@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -41,14 +42,31 @@ class VetController {
 		this.vetRepository = vetRepository;
 	}
 
+	@GetMapping("/vets/find")
+	public String initFindForm(Model model) {
+		model.addAttribute("vet", new Vet());
+		return "vets/findVets";
+	}
+
 	@GetMapping("/vets.html")
-	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
-		// Here we are returning an object of type 'Vets' rather than a collection of Vet
-		// objects so it is simpler for Object-Xml mapping
-		Vets vets = new Vets();
-		Page<Vet> paginated = findPaginated(page);
-		vets.getVetList().addAll(paginated.toList());
-		return addPaginationModel(page, paginated, model);
+	public String processFindForm(@RequestParam(defaultValue = "1") int page, Vet vet, BindingResult result,
+			Model model) {
+		// allow parameterless GET request for /vets to return all records
+		String lastName = vet.getLastName();
+		if (lastName == null) {
+			lastName = ""; // empty string signifies broadest possible search
+		}
+
+		// find vets by last name
+		Page<Vet> vetsResults = findPaginatedForVetsLastName(page, lastName);
+		if (vetsResults.isEmpty()) {
+			// no vets found
+			result.rejectValue("lastName", "notFound", "not found");
+			return "vets/findVets";
+		}
+
+		// multiple vets found
+		return addPaginationModel(page, vetsResults, model);
 	}
 
 	private String addPaginationModel(int page, Page<Vet> paginated, Model model) {
@@ -60,10 +78,10 @@ class VetController {
 		return "vets/vetList";
 	}
 
-	private Page<Vet> findPaginated(int page) {
+	private Page<Vet> findPaginatedForVetsLastName(int page, String lastname) {
 		int pageSize = 5;
 		Pageable pageable = PageRequest.of(page - 1, pageSize);
-		return vetRepository.findAll(pageable);
+		return vetRepository.findByLastNameStartingWith(lastname, pageable);
 	}
 
 	@GetMapping({ "/vets" })
