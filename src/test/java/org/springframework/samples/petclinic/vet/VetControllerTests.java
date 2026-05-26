@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -76,7 +77,8 @@ class VetControllerTests {
 		given(this.vets.findAll()).willReturn(Lists.newArrayList(james(), helen()));
 		given(this.vets.findAll(any(Pageable.class)))
 			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james(), helen())));
-
+		given(this.vets.findByLastNameStartingWith(eq(""), any(Pageable.class)))
+			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james(), helen())));
 	}
 
 	@Test
@@ -87,6 +89,30 @@ class VetControllerTests {
 			.andExpect(model().attributeExists("listVets"))
 			.andExpect(view().name("vets/vetList"));
 
+	}
+
+	@Test
+	void testFindByName() throws Exception {
+		given(this.vets.findByLastNameStartingWith(eq("Carter"), any(Pageable.class)))
+			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james())));
+
+		mockMvc.perform(get("/vets.html").param("lastName", "Carter"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("listVets"))
+			.andExpect(model().attribute("lastName", "Carter"))
+			.andExpect(view().name("vets/vetList"));
+	}
+
+	@Test
+	void testFindByNameNotFound() throws Exception {
+		given(this.vets.findByLastNameStartingWith(eq("Unknown"), any(Pageable.class)))
+			.willReturn(new PageImpl<Vet>(Lists.newArrayList()));
+
+		mockMvc.perform(get("/vets.html").param("lastName", "Unknown"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeHasFieldErrors("vet", "lastName"))
+			.andExpect(model().attributeHasFieldErrorCode("vet", "lastName", "notFound"))
+			.andExpect(view().name("vets/vetList"));
 	}
 
 	@Test
