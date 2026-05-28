@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,6 +33,7 @@ import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerA
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +42,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.samples.petclinic.owner.OwnerRepository;
+import org.springframework.samples.petclinic.owner.PetRepository;
+import org.springframework.samples.petclinic.owner.VisitRepository;
+import org.springframework.samples.petclinic.vet.VetRepository;
 
 /**
  * Integration Test for {@link CrashController}.
@@ -95,6 +101,26 @@ class CrashControllerIntegrationTests {
 	@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
 			DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
 	static class TestConfiguration {
+
+		@Bean
+		OwnerRepository ownerRepository() {
+			return Mockito.mock(OwnerRepository.class);
+		}
+
+		@Bean
+		PetRepository petRepository() {
+			return Mockito.mock(PetRepository.class);
+		}
+
+		@Bean
+		VisitRepository visitRepository() {
+			return Mockito.mock(VisitRepository.class);
+		}
+
+		@Bean
+		VetRepository vetRepository() {
+			return Mockito.mock(VetRepository.class);
+		}
 
 	}
 
