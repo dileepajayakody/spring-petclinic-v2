@@ -17,9 +17,17 @@ package org.springframework.samples.petclinic.vet;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +41,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Arjen Poutsma
  */
 @Controller
+@Tag(name = "Vets", description = "Read-only veterinary API endpoints")
 class VetController {
 
 	private final VetRepository vetRepository;
@@ -41,6 +50,7 @@ class VetController {
 		this.vetRepository = vetRepository;
 	}
 
+	@Hidden
 	@GetMapping("/vets.html")
 	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
@@ -66,7 +76,11 @@ class VetController {
 		return vetRepository.findAll(pageable);
 	}
 
-	@GetMapping({ "/vets" })
+	@Operation(summary = "List veterinarians", description = "Returns all veterinarians with their specialties.")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Veterinarian list returned",
+			content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+					schema = @Schema(implementation = Vets.class))) })
+	@GetMapping(path = "/vets", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for JSon/Object mapping

@@ -20,11 +20,14 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledInNativeImage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.samples.petclinic.system.OpenApiConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,12 +44,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @WebMvcTest(VetController.class)
+@Import(OpenApiConfiguration.class)
 @DisabledInNativeImage
 @DisabledInAotMode
 class VetControllerTests {
 
 	@Autowired
 	private MockMvc mockMvc;
+
+	@Value("${springdoc.api-docs.path:/v3/api-docs}")
+	private String apiDocsPath;
 
 	@MockitoBean
 	private VetRepository vets;
@@ -95,6 +102,20 @@ class VetControllerTests {
 			.andExpect(status().isOk());
 		actions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.vetList[0].id").value(1));
+	}
+
+	@Test
+	void apiDocumentationIsExposed() throws Exception {
+		mockMvc.perform(get(this.apiDocsPath).param("group", "petclinic"))
+			.andExpect(status().isOk())
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+			.andExpect(jsonPath("$.info.title").value("Spring PetClinic API"))
+			.andExpect(jsonPath("$.paths['/vets']").exists());
+	}
+
+	@Test
+	void swaggerUiIsExposed() throws Exception {
+		mockMvc.perform(get("/swagger-ui/index.html")).andExpect(status().isOk());
 	}
 
 }
