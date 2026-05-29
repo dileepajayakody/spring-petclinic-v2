@@ -20,6 +20,10 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.Assert;
@@ -43,6 +47,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author Arjen Poutsma
  * @author Wick Dynex
  */
+@Tag(name = "Pets", description = "Endpoints for managing pets belonging to an owner")
 @Controller
 @RequestMapping("/owners/{ownerId}")
 class PetController {
@@ -96,6 +101,7 @@ class PetController {
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
+	@Operation(summary = "Show add pet form", description = "Displays the form to add a new pet to an owner")
 	@GetMapping("/pets/new")
 	public String initCreationForm(Owner owner, ModelMap model) {
 		Pet pet = new Pet();
@@ -103,6 +109,7 @@ class PetController {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	@Operation(summary = "Add pet", description = "Processes the form submission to add a new pet to an owner")
 	@PostMapping("/pets/new")
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
@@ -126,11 +133,13 @@ class PetController {
 		return "redirect:/owners/{ownerId}";
 	}
 
+	@Operation(summary = "Show edit pet form", description = "Displays the form to edit an existing pet")
 	@GetMapping("/pets/{petId}/edit")
 	public String initUpdateForm() {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	@Operation(summary = "Update pet", description = "Processes the form submission to update an existing pet")
 	@PostMapping("/pets/{petId}/edit")
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {

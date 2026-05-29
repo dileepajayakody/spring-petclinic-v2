@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +49,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author Michael Isvy
  * @author Wick Dynex
  */
+@Tag(name = "Owners", description = "Endpoints for managing pet owners")
 @Controller
 class OwnerController {
 
@@ -69,11 +74,13 @@ class OwnerController {
 							+ ". Please ensure the ID is correct " + "and the owner exists in the database."));
 	}
 
+	@Operation(summary = "Show create owner form", description = "Displays the form to create a new owner")
 	@GetMapping("/owners/new")
 	public String initCreationForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
+	@Operation(summary = "Create owner", description = "Processes the form submission to create a new owner")
 	@PostMapping("/owners/new")
 	public String processCreationForm(@Valid Owner owner, BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
@@ -86,14 +93,17 @@ class OwnerController {
 		return "redirect:/owners/" + owner.getId();
 	}
 
+	@Operation(summary = "Show find owner form", description = "Displays the form to search for owners")
 	@GetMapping("/owners/find")
 	public String initFindForm() {
 		return "owners/findOwners";
 	}
 
+	@Operation(summary = "Find owners", description = "Searches owners by last name and returns paginated results")
 	@GetMapping("/owners")
-	public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result,
-			Model model) {
+	public String processFindForm(
+			@Parameter(description = "Page number, starting from 1") @RequestParam(defaultValue = "1") int page,
+			Owner owner, BindingResult result, Model model) {
 		// allow parameterless GET request for /owners to return all records
 		String lastName = owner.getLastName();
 		if (lastName == null) {
@@ -133,13 +143,16 @@ class OwnerController {
 		return owners.findByLastNameStartingWith(lastname, pageable);
 	}
 
+	@Operation(summary = "Show edit owner form", description = "Displays the form to edit an existing owner")
 	@GetMapping("/owners/{ownerId}/edit")
 	public String initUpdateOwnerForm() {
 		return VIEWS_OWNER_CREATE_OR_UPDATE_FORM;
 	}
 
+	@Operation(summary = "Update owner", description = "Processes the form submission to update an existing owner")
 	@PostMapping("/owners/{ownerId}/edit")
-	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result, @PathVariable("ownerId") int ownerId,
+	public String processUpdateOwnerForm(@Valid Owner owner, BindingResult result,
+			@Parameter(description = "ID of the owner to update") @PathVariable("ownerId") int ownerId,
 			RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
 			redirectAttributes.addFlashAttribute("error", "There was an error in updating the owner.");
@@ -163,8 +176,10 @@ class OwnerController {
 	 * @param ownerId the ID of the owner to display
 	 * @return a ModelMap with the model attributes for the view
 	 */
+	@Operation(summary = "Show owner details", description = "Displays the details of a specific owner")
 	@GetMapping("/owners/{ownerId}")
-	public ModelAndView showOwner(@PathVariable("ownerId") int ownerId) {
+	public ModelAndView showOwner(
+			@Parameter(description = "ID of the owner to display") @PathVariable("ownerId") int ownerId) {
 		ModelAndView mav = new ModelAndView("owners/ownerDetails");
 		Optional<Owner> optionalOwner = this.owners.findById(ownerId);
 		Owner owner = optionalOwner.orElseThrow(() -> new IllegalArgumentException(

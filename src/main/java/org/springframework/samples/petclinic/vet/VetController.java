@@ -17,6 +17,10 @@ package org.springframework.samples.petclinic.vet;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Ken Krebs
  * @author Arjen Poutsma
  */
+@Tag(name = "Vets", description = "Endpoints for viewing veterinarians")
 @Controller
 class VetController {
 
@@ -41,8 +46,11 @@ class VetController {
 		this.vetRepository = vetRepository;
 	}
 
+	@Operation(summary = "List vets (HTML)", description = "Returns a paginated HTML page of all veterinarians")
 	@GetMapping("/vets.html")
-	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
+	public String showVetList(
+			@Parameter(description = "Page number, starting from 1") @RequestParam(defaultValue = "1") int page,
+			Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
 		Vets vets = new Vets();
@@ -66,6 +74,7 @@ class VetController {
 		return vetRepository.findAll(pageable);
 	}
 
+	@Operation(summary = "List vets (JSON)", description = "Returns all veterinarians as a JSON response")
 	@GetMapping({ "/vets" })
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet

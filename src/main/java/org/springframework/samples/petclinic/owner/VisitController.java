@@ -18,6 +18,9 @@ package org.springframework.samples.petclinic.owner;
 import java.util.Map;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -38,6 +41,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author Dave Syer
  * @author Wick Dynex
  */
+@Tag(name = "Visits", description = "Endpoints for managing pet visits")
 @Controller
 class VisitController {
 
@@ -81,6 +85,7 @@ class VisitController {
 
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is
 	// called
+	@Operation(summary = "Show add visit form", description = "Displays the form to add a new visit for a pet")
 	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String initNewVisitForm() {
 		return "pets/createOrUpdateVisitForm";
@@ -88,6 +93,7 @@ class VisitController {
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
 	// called
+	@Operation(summary = "Add visit", description = "Processes the form submission to add a new visit for a pet")
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
