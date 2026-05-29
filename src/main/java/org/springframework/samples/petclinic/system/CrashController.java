@@ -15,6 +15,9 @@
  */
 package org.springframework.samples.petclinic.system;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -25,9 +28,12 @@ import org.springframework.web.bind.annotation.GetMapping;
  * <p/>
  * Also see how a view that resolves to "error" has been added ("error.html").
  */
+@Tag(name = "System", description = "System endpoints for error handling demonstration")
 @Controller
 class CrashController {
 
+	@Operation(summary = "Trigger exception",
+			description = "Endpoint that intentionally throws a RuntimeException to demonstrate error handling")
 	@GetMapping("/oups")
 	public String triggerException() {
 		throw new RuntimeException(
