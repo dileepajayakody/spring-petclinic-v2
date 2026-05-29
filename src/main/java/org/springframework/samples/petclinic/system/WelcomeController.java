@@ -16,12 +16,18 @@
 
 package org.springframework.samples.petclinic.system;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+@Tag(name = "System", description = "System and utility endpoints")
 @Controller
 class WelcomeController {
 
+	@Operation(summary = "Welcome page", description = "Displays the PetClinic welcome / home page")
+	@ApiResponse(responseCode = "200", description = "Welcome page displayed")
 	@GetMapping("/")
 	public String welcome() {
 		return "welcome";

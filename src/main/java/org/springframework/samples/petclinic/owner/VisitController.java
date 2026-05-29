@@ -27,6 +27,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -38,6 +43,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author Dave Syer
  * @author Wick Dynex
  */
+@Tag(name = "Visits", description = "Endpoints for managing pet visits to the clinic")
 @Controller
 class VisitController {
 
@@ -81,6 +87,9 @@ class VisitController {
 
 	// Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is
 	// called
+	@Operation(summary = "Show new visit form", description = "Displays the form to schedule a new visit for a pet")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "New visit form displayed"),
+			@ApiResponse(responseCode = "500", description = "Owner or pet not found (IllegalArgumentException)") })
 	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/new")
 	public String initNewVisitForm() {
 		return "pets/createOrUpdateVisitForm";
@@ -88,8 +97,14 @@ class VisitController {
 
 	// Spring MVC calls method loadPetWithVisit(...) before processNewVisitForm is
 	// called
+	@Operation(summary = "Book a new visit",
+			description = "Processes the new visit form and books the visit for the pet")
+	@ApiResponses({
+			@ApiResponse(responseCode = "302", description = "Visit booked successfully, redirects to owner details"),
+			@ApiResponse(responseCode = "200", description = "Validation errors, form re-displayed") })
 	@PostMapping("/owners/{ownerId}/pets/{petId}/visits/new")
-	public String processNewVisitForm(@ModelAttribute Owner owner, @PathVariable int petId, @Valid Visit visit,
+	public String processNewVisitForm(@ModelAttribute Owner owner,
+			@Parameter(description = "ID of the pet for the visit") @PathVariable int petId, @Valid Visit visit,
 			BindingResult result, RedirectAttributes redirectAttributes) {
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
