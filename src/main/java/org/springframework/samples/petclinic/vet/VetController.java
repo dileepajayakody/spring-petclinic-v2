@@ -26,6 +26,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * @author Juergen Hoeller
  * @author Mark Fisher
@@ -33,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Arjen Poutsma
  */
 @Controller
+@Tag(name = "Veterinarians", description = "Veterinarian directory endpoints")
 class VetController {
 
 	private final VetRepository vetRepository;
@@ -67,6 +74,11 @@ class VetController {
 	}
 
 	@GetMapping({ "/vets" })
+	@Operation(summary = "List veterinarians",
+			description = "Returns every veterinarian with their specialties as JSON or XML.")
+	@ApiResponse(responseCode = "200", description = "Veterinarians returned",
+			content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Vets.class)),
+					@Content(mediaType = "application/xml", schema = @Schema(implementation = Vets.class)) })
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for JSon/Object mapping
