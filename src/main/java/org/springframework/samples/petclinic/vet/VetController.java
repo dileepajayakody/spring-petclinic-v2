@@ -20,6 +20,13 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Ken Krebs
  * @author Arjen Poutsma
  */
+@Tag(name = "Veterinarians", description = "Endpoints for viewing veterinarian information")
 @Controller
 class VetController {
 
@@ -41,8 +49,12 @@ class VetController {
 		this.vetRepository = vetRepository;
 	}
 
+	@Operation(summary = "List veterinarians (HTML)",
+			description = "Displays a paginated list of all veterinarians as an HTML page")
+	@ApiResponse(responseCode = "200", description = "Veterinarians list page displayed")
 	@GetMapping("/vets.html")
-	public String showVetList(@RequestParam(defaultValue = "1") int page, Model model) {
+	public String showVetList(
+			@Parameter(description = "Page number (1-based)") @RequestParam(defaultValue = "1") int page, Model model) {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet
 		// objects so it is simpler for Object-Xml mapping
 		Vets vets = new Vets();
@@ -66,6 +78,10 @@ class VetController {
 		return vetRepository.findAll(pageable);
 	}
 
+	@Operation(summary = "List veterinarians (JSON)",
+			description = "Returns the full list of all veterinarians as a JSON response")
+	@ApiResponse(responseCode = "200", description = "List of veterinarians returned",
+			content = @Content(mediaType = "application/json", schema = @Schema(implementation = Vets.class)))
 	@GetMapping({ "/vets" })
 	public @ResponseBody Vets showResourcesVetList() {
 		// Here we are returning an object of type 'Vets' rather than a collection of Vet

@@ -33,6 +33,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -43,6 +48,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * @author Arjen Poutsma
  * @author Wick Dynex
  */
+@Tag(name = "Pets", description = "Endpoints for managing pets belonging to an owner")
 @Controller
 @RequestMapping("/owners/{ownerId}")
 class PetController {
@@ -96,6 +102,9 @@ class PetController {
 		dataBinder.setDisallowedFields("id", "*.id");
 	}
 
+	@Operation(summary = "Show new pet form", description = "Displays the form to add a new pet to an owner")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "New pet form displayed"),
+			@ApiResponse(responseCode = "500", description = "Owner not found (IllegalArgumentException)") })
 	@GetMapping("/pets/new")
 	public String initCreationForm(Owner owner, ModelMap model) {
 		Pet pet = new Pet();
@@ -103,6 +112,10 @@ class PetController {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	@Operation(summary = "Add a new pet", description = "Processes the new pet form and adds the pet to the owner")
+	@ApiResponses({
+			@ApiResponse(responseCode = "302", description = "Pet added successfully, redirects to owner details"),
+			@ApiResponse(responseCode = "200", description = "Validation errors, form re-displayed") })
 	@PostMapping("/pets/new")
 	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
@@ -126,11 +139,19 @@ class PetController {
 		return "redirect:/owners/{ownerId}";
 	}
 
+	@Operation(summary = "Show edit pet form", description = "Displays the form to edit an existing pet")
+	@ApiResponses({ @ApiResponse(responseCode = "200", description = "Edit pet form displayed"),
+			@ApiResponse(responseCode = "500", description = "Owner or pet not found (IllegalArgumentException)") })
 	@GetMapping("/pets/{petId}/edit")
 	public String initUpdateForm() {
 		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
 	}
 
+	@Operation(summary = "Update an existing pet",
+			description = "Processes the edit pet form and saves the updated pet details")
+	@ApiResponses({
+			@ApiResponse(responseCode = "302", description = "Pet updated successfully, redirects to owner details"),
+			@ApiResponse(responseCode = "200", description = "Validation errors, form re-displayed") })
 	@PostMapping("/pets/{petId}/edit")
 	public String processUpdateForm(Owner owner, @Valid Pet pet, BindingResult result,
 			RedirectAttributes redirectAttributes) {
