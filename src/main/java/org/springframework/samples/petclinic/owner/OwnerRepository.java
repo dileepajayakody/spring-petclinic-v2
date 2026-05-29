@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * Repository class for <code>Owner</code> domain objects. All method names are compliant
@@ -34,6 +35,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Wick Dynex
  */
 public interface OwnerRepository extends JpaRepository<Owner, Integer> {
+
+	@Query("SELECT COUNT(owner) FROM Owner owner")
+	long countOwners();
 
 	/**
 	 * Retrieve {@link Owner}s from the data store by last name, returning all owners

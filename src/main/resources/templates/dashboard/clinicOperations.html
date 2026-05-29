@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{fragments/layout :: layout (~{::body},'dashboard')}">
+
+<body>
+
+  <h2 th:text="#{dashboard.title}">Clinic Operations Dashboard</h2>
+  <p class="dashboard-subtitle" th:text="#{dashboard.subtitle}">A quick operational snapshot for staff.</p>
+
+  <section class="dashboard-kpi-grid">
+    <article class="dashboard-kpi-card">
+      <span class="dashboard-kpi-label" th:text="#{dashboard.kpi.owners}">Owners</span>
+      <strong class="dashboard-kpi-value" th:text="${dashboard.totals.ownerCount}">0</strong>
+    </article>
+    <article class="dashboard-kpi-card">
+      <span class="dashboard-kpi-label" th:text="#{dashboard.kpi.pets}">Pets</span>
+      <strong class="dashboard-kpi-value" th:text="${dashboard.totals.petCount}">0</strong>
+    </article>
+    <article class="dashboard-kpi-card">
+      <span class="dashboard-kpi-label" th:text="#{dashboard.kpi.visits}">Visits</span>
+      <strong class="dashboard-kpi-value" th:text="${dashboard.totals.visitCount}">0</strong>
+    </article>
+    <article class="dashboard-kpi-card">
+      <span class="dashboard-kpi-label" th:text="#{dashboard.kpi.vets}">Vets</span>
+      <strong class="dashboard-kpi-value" th:text="${dashboard.totals.vetCount}">0</strong>
+    </article>
+  </section>
+
+  <section class="row dashboard-summary-row">
+    <div class="col-lg-6">
+      <div class="dashboard-panel">
+        <h3 th:text="#{dashboard.petMix.title}">Pet Mix</h3>
+        <table class="table table-striped table-sm dashboard-table">
+          <thead>
+            <tr>
+              <th th:text="#{type}">Type</th>
+              <th th:text="#{dashboard.count}">Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="petType : ${dashboard.petTypeSummary}">
+              <td th:text="${petType.typeName}">dog</td>
+              <td th:text="${petType.petCount}">0</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.petTypeSummary)}">
+              <td colspan="2" class="dashboard-empty" th:text="#{dashboard.petMix.empty}">No pet mix data available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="dashboard-panel">
+        <h3 th:text="#{dashboard.specialtyCoverage.title}">Vet Specialty Coverage</h3>
+        <table class="table table-striped table-sm dashboard-table">
+          <thead>
+            <tr>
+              <th th:text="#{specialties}">Specialties</th>
+              <th th:text="#{dashboard.vetCount}">Vet Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="specialty : ${dashboard.specialtyCoverage}">
+              <td th:text="${specialty.specialtyName}">radiology</td>
+              <td th:text="${specialty.vetCount}">0</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(dashboard.specialtyCoverage)}">
+              <td colspan="2" class="dashboard-empty" th:text="#{dashboard.specialtyCoverage.empty}">No specialty coverage data available.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="row dashboard-activity-row">
+    <div class="col-lg-6">
+      <div class="dashboard-panel">
+        <h3 th:text="#{dashboard.recentVisits.title}">Recent Visits</h3>
+        <table class="table table-striped table-sm dashboard-table" th:if="${not #lists.isEmpty(dashboard.recentVisits)}">
+          <thead>
+            <tr>
+              <th th:text="#{date}">Date</th>
+              <th th:text="#{pet}">Pet</th>
+              <th th:text="#{owner}">Owner</th>
+              <th th:text="#{description}">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="visit : ${dashboard.recentVisits}">
+              <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}">2013-01-01</td>
+              <td th:text="${visit.petName}">Leo</td>
+              <td th:text="${visit.ownerName}">George Franklin</td>
+              <td th:text="${visit.description}">rabies shot</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="dashboard-empty" th:if="${#lists.isEmpty(dashboard.recentVisits)}"
+          th:text="#{dashboard.recentVisits.empty}">No recent visits recorded.</p>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="dashboard-panel">
+        <h3 th:text="#{dashboard.upcomingVisits.title}">Upcoming Visits</h3>
+        <table class="table table-striped table-sm dashboard-table" th:if="${not #lists.isEmpty(dashboard.upcomingVisits)}">
+          <thead>
+            <tr>
+              <th th:text="#{date}">Date</th>
+              <th th:text="#{pet}">Pet</th>
+              <th th:text="#{owner}">Owner</th>
+              <th th:text="#{description}">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="visit : ${dashboard.upcomingVisits}">
+              <td th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}">2013-01-01</td>
+              <td th:text="${visit.petName}">Leo</td>
+              <td th:text="${visit.ownerName}">George Franklin</td>
+              <td th:text="${visit.description}">rabies shot</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="dashboard-empty" th:if="${#lists.isEmpty(dashboard.upcomingVisits)}"
+          th:text="#{dashboard.upcomingVisits.empty}">No upcoming visits scheduled.</p>
+      </div>
+    </div>
+  </section>
+
+</body>
+
+</html>
