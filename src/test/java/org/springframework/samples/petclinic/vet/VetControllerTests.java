@@ -74,9 +74,17 @@ class VetControllerTests {
 	@BeforeEach
 	void setup() {
 		given(this.vets.findAll()).willReturn(Lists.newArrayList(james(), helen()));
-		given(this.vets.findAll(any(Pageable.class)))
+		given(this.vets.findByLastNameStartingWith(any(), any(Pageable.class)))
 			.willReturn(new PageImpl<Vet>(Lists.newArrayList(james(), helen())));
 
+	}
+
+	@Test
+	void testInitFindForm() throws Exception {
+		mockMvc.perform(get("/vets/find"))
+			.andExpect(status().isOk())
+			.andExpect(model().attributeExists("vet"))
+			.andExpect(view().name("vets/findVets"));
 	}
 
 	@Test
